@@ -1,0 +1,13 @@
+[package]
+name = "unborrow"
+version = "0.1.0"
+authors = ["Alex Burka <aburka@seas.upenn.edu>"]
+
+description = "Macro for calling a &mut self method with transient &-borrows of self in the parameters"
+homepage = "https://github.com/durka/unborrow"
+repository = "https://github.com/durka/unborrow"
+readme = "README.md"
+license = "MIT"
+keywords = ["borrow", "lifetime", "macro"]
+
+[dependencies]
