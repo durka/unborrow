@@ -23,6 +23,12 @@
 /// // but wrap the call in unborrow!() and it works!
 /// unborrow!(v.insert(v.len() - 1, v[0] + 41));
 /// assert_eq!(v, [1, 2, 42, 3]);
+///
+/// // it also works for nested objects!
+/// struct Wrapper { v: Vec<i32> }
+/// let mut w = Wrapper { v: vec![1, 2, 3] };
+/// unborrow!(w.v.reserve(w.v.capacity()));
+///
 /// # }
 /// ```
 #[macro_export]
@@ -33,14 +39,14 @@ macro_rules! unborrow {
     // This rule fires when we have parsed all the arguments.
     // It just falls through to output stage.
     // (FIXME could fold the output rule into this one to reduce recursion)
-    (@parse () -> ($names:tt $lets:tt) $($obj:ident).+) => {
-        unborrow!(@out $names $lets $($obj).+)
+    (@parse () -> ($names:tt $lets:tt) $($thru:tt)*) => {
+        unborrow!(@out $names $lets $($thru)*)
     };
 
     // Parse an argument and continue parsing
     // This is the key rule, assigning a name for the argument and generating the let statement.
-    (@parse ($arg:expr, $($rest:tt)*) -> ([$($names:ident),*] [$($lets:stmt);*]) $($obj:ident).+) => {
-        unborrow!(@parse ($($rest)*) -> ([$($names,)* arg] [$($lets;)* let arg = $arg]) $($obj).+)
+    (@parse ($arg:expr, $($rest:tt)*) -> ([$($names:ident),*] [$($lets:stmt);*]) $($thru:tt)*) => {
+        unborrow!(@parse ($($rest)*) -> ([$($names,)* arg] [$($lets;)* let arg = $arg]) $($thru)*)
         //                                            ^                    ^
         // Right here an ident is created out of thin air using hygiene.
         // Every time the macro recurses, we get a new syntax context, so "arg" is actually a new identifier!
