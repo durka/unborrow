@@ -1,7 +1,7 @@
 [package]
 name = "unborrow"
-version = "0.1.0"
-authors = ["Alex Burka <aburka@seas.upenn.edu>"]
+version = "0.2.0"
+authors = ["Alex Burka <aburka@seas.upenn.edu>", "David Avedissian <git@davedissian.com>"]
 
 description = "Macro for calling a &mut self method with transient &-borrows of self in the parameters"
 homepage = "https://github.com/durka/unborrow"

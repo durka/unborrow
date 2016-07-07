@@ -23,6 +23,12 @@
 /// // but wrap the call in unborrow!() and it works!
 /// unborrow!(v.insert(v.len() - 1, v[0] + 41));
 /// assert_eq!(v, [1, 2, 42, 3]);
+///
+/// // it also works for nested objects!
+/// struct Wrapper { v: Vec<i32> }
+/// let mut w = Wrapper { v: vec![1, 2, 3] };
+/// unborrow!(w.v.reserve(w.v.capacity()));
+///
 /// # }
 /// ```
 #[macro_export]
@@ -49,17 +55,17 @@ macro_rules! unborrow {
     // Output stage.
     // Assembles the let statements and variable names into a block which computes the arguments,
     // calls the method, and returns its result.
-    (@out [$($names:ident),*] [$($lets:stmt);*] $obj:ident $meth:ident) => {{
+    (@out [$($names:ident),*] [$($lets:stmt);*] $($obj:ident).+) => {{
         $($lets;)*
-        $obj.$meth($($names),*)
+        $($obj).+($($names),*)
     }};
 
     // =========================================================================================================
     // PUBLIC RULES
 
     // Macro entry point.
-    ($obj:ident . $meth:ident ($($args:expr),*)) => {
-        unborrow!(@parse ($($args,)*) -> ([] []) $obj $meth)
+    ($($obj:ident).+ ($($args:expr),*)) => {
+        unborrow!(@parse ($($args,)*) -> ([] []) $($obj).+)
         //                |               |  |   ^ info about the method call, saved for later
         //                |               |  ^ generated let statements
         //                |               ^ generated argument names
