@@ -1,3 +1,5 @@
+#![no_std]
+
 /// Explicitly precompute a method's arguments before the call so that borrowck sees them the same
 /// way that trans does.
 ///
