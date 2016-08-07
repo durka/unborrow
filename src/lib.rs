@@ -31,6 +31,10 @@
 /// let mut w = Wrapper { v: vec![1, 2, 3] };
 /// unborrow!(w.v.reserve(w.v.capacity()));
 ///
+/// // ...and with free functions! (the first argument is assumed to be the mutable borrow)
+/// use std::mem;
+/// unborrow!(mem::replace(&mut v, v.clone()));
+///
 /// # }
 /// ```
 #[macro_export]
@@ -53,10 +57,16 @@ macro_rules! unborrow {
         // Right here an ident is created out of thin air using hygiene.
         // Every time the macro recurses, we get a new syntax context, so "arg" is actually a new identifier!
     };
-    
-    // Output stage.
+
+    // Output stage for free functions.
     // Assembles the let statements and variable names into a block which computes the arguments,
     // calls the method, and returns its result.
+    (@out [$($names:ident),*] [$($lets:stmt);*] ($($meth:ident)::+) $arg1:expr) => {{
+        $($lets;)*
+        $($meth)::+($arg1, $($names),*)
+    }};
+    
+    // Output stage for object methods.
     (@out [$($names:ident),*] [$($lets:stmt);*] $($obj:ident).+) => {{
         $($lets;)*
         $($obj).+($($names),*)
@@ -65,13 +75,18 @@ macro_rules! unborrow {
     // =========================================================================================================
     // PUBLIC RULES
 
-    // Macro entry point.
+    // Macro entry point for object methods.
     ($($obj:ident).+ ($($args:expr),*)) => {
         unborrow!(@parse ($($args,)*) -> ([] []) $($obj).+)
         //                |               |  |   ^ info about the method call, saved for later
         //                |               |  ^ generated let statements
         //                |               ^ generated argument names
         //                ^ arguments to be parsed
-    }
+    };
+
+    // Macro entry point for free functions.
+    ($($meth:ident)::+ ($arg1:expr, $($args:expr),*)) => {
+        unborrow!(@parse ($($args,)*) -> ([] []) ($($meth)::+) $arg1)
+    };
 }
 
