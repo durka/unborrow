@@ -1,9 +1,10 @@
 [package]
 name = "unborrow"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Alex Burka <aburka@seas.upenn.edu>", "David Avedissian <git@davedissian.com>"]
 
 description = "Macro for calling a &mut self method with transient &-borrows of self in the parameters"
+categories = ["rust-patterns", "memory-management"]
 homepage = "https://github.com/durka/unborrow"
 repository = "https://github.com/durka/unborrow"
 readme = "README.md"
