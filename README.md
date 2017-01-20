@@ -24,7 +24,7 @@ let mut v = vec![1, 2, 3];
 unborrow!(v.reserve(v.capacity()));
 ```
 
-By the way, this issue could conceivably disappear if "non-lexical borrowing" is ever added to the Rust compiler.
+By the way, this issue could conceivably disappear if ["non-lexical lifetimes"](http://smallcultfollowing.com/babysteps/blog/2016/04/27/non-lexical-lifetimes-introduction/) are ever added to the Rust language.
 
 As an aside, this macro would be interesting to read if you are curious about details of macro hygiene in Rust. The macro exploits hygiene to achieve a "gensym"-like facility: to precompute all arguments to a function in bindings, we need unique names for each of those bindings that don't collide with any other variables in scope. If you look at the pretty-expanded form of the source, it looks like all the bindings are named "arg". But in fact, they are all different because they are tagged with different hygiene contexts. See the source code for more.
 
